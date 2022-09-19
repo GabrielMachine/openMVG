@@ -16,7 +16,8 @@
 
 #include "openMVG/robust_estimation/robust_estimator_MaxConsensus.hpp"
 #include "openMVG/robust_estimation/score_evaluator.hpp"
-//#include "software/SfM/SfMPlyHelper.hpp"
+#include "software/SfM/SfMPlyHelper.hpp"
+#include "openMVG/multiview/triangulation_nview.hpp"
 
 static void
 invert_intrinsics(
@@ -496,12 +497,12 @@ RobustSolve()
   double threshold =
     NormalizedSquaredPointReprojectionOntoOneViewError::threshold_pixel_to_normalized(1, K_);
   threshold *= threshold; // squared error
-  unsigned constexpr max_iteration = 1; // testing
+  unsigned constexpr max_iteration = 5; // testing
   // Vector of inliers for the best fit found
-  const auto model = MaxConsensus(trifocal_kernel,
+  model = MaxConsensus(trifocal_kernel,
       ScorerEvaluator<TrifocalKernel>(threshold), &vec_inliers_, max_iteration);
   cerr << "vec_inliers size: "<< vec_inliers_.size() << "\n";
-  cerr << "model: " << model[0] << "\n";
+  cerr << "model: " << model[2] << "\n";
   // TODO(gabriel) recontruct from inliers and best models to show as PLY
 }
 
@@ -871,34 +872,42 @@ DisplayInliersCamerasAndPointsSIFT()
       svg_file << svg_stream.closeSvgFile().str();
     }
 }
-//void TrifocalSampleApp::
-//ExportBaseReconstructiontoPLY(){
-//
-//  std::vector<Mat3X> inlier_coordinates_; 
-//  unsigned track_inlier=0;
-//  for (const auto &track_it: tracks_) {
-//    bool inlier=false;
-//    for (unsigned i=0; i < vec_inliers_.size(); ++i)
-//      if (track_inlier == vec_inliers_.at(i))
-//        inlier = true;
-//        
-//    if (!inlier) {
-//      track_inlier++;
-//      continue;
-//    }
-//    
-//    auto iter = track_it.second.cbegin();
-//    const uint32_t
-//      i = iter->second,
-//      j = (++iter)->second,
-//      k = (++iter)->second;
-//    //
-//    const auto feature_i = sio_regions_[0]->Features()[i];
-//    const auto feature_j = sio_regions_[1]->Features()[j];
-//    const auto feature_k = sio_regions_[2]->Features()[k];
-//    
-//    track_inlier++;
-//  }
-//}
+void TrifocalSampleApp::
+ExportBaseReconstructiontoPLY(){
+
+  std::vector<Mat3X> inlier_coordinates_; 
+  unsigned track_inlier=0;
+  for (const auto &track_it: tracks_) {
+    bool inlier=false;
+    for (unsigned i=0; i < vec_inliers_.size(); ++i)
+      if (track_inlier == vec_inliers_.at(i))
+        inlier = true;
+        
+    if (!inlier) {
+      track_inlier++;
+      continue;
+    }
+    
+    auto iter = track_it.second.cbegin();
+    const uint32_t
+      i = iter->second,
+      j = (++iter)->second,
+      k = (++iter)->second;
+    //
+    const auto feature_i = sio_regions_[0]->Features()[i];
+    const auto feature_j = sio_regions_[1]->Features()[j];
+    const auto feature_k = sio_regions_[2]->Features()[k];
+     
+    Mat3 bearing;
+    bearing[0] = feature_i;
+    bearing[1] = feature_j; 
+    bearing[2] = feature_k;
+    inlier_coordinates_.push_back(bearing);
+      track_inlier++;
+  }
+  Vec4 triangulated_ply;
+  TriangulateNView(inlier_coordinates_, model, &triangulated_ply);
+  cerr << triangulated_ply << "\n";
+}
 } // namespace trifocal3pt
 

@@ -40,6 +40,7 @@ struct TrifocalSampleApp {
   void DisplayDesiredInliers();
   void DisplayInliersCamerasAndPoints(); // display inliers and and tracks
   void DisplayInliersCamerasAndPointsSIFT();
+  void ExportBaseReconstructiontoPLY();
   
   // ---------------------------------------------------------------------------
   // Data
@@ -77,6 +78,8 @@ struct TrifocalSampleApp {
   
   // Vector of inliers for the best fit found
   vector<uint32_t> vec_inliers_;
+  // Model that holds best fit cameras
+  vector<Mat34> model;
 };
 
 } // namespace trifocal3pt
