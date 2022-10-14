@@ -38,7 +38,7 @@
 using namespace openMVG;
 using namespace openMVG::cameras;
 using namespace openMVG::sfm;
-
+using namespace std;
 
 // TODO(trifocal future) incremental v2: update for triplet 
 enum class ESfMSceneInitializer
