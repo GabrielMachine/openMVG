@@ -132,10 +132,11 @@ bool computeIndexFromImageNames(
 }
 
 /// From 2 given image filenames, find the 3 corresponding index in the View list
+/// Gabriel Note: Should be three pictures, shouldn't?
 bool computeIndexFromImageNames(
   const SfM_Data & sfm_data,
-  const std::tuple<std::string,std::string,std::string>& initialTripletName,
-  Triplet& initialTripletIndex)
+  const std::tuple<std::string,std::string,std::string>& initialTripletName, // You are giving three pictures as input here, however the information in the python file only takes a pair. 
+  Triplet& initialTripletIndex)                                              // Check SfM_SequentialPipeline.py . It computes and filter in pair. I think it's good to make a triplet version
 {
   if (get<0>(initialTripletName) == get<1>(initialTripletName) || 
       get<0>(initialTripletName) == get<2>(initialTripletName) || 

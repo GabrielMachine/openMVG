@@ -69,6 +69,9 @@ using Triplet = std::tuple<IndexT, IndexT, IndexT>;
 /// Set of Pair
 using Pair_Set = std::set<Pair>;
 
+/// Set of Triplet
+using Tripl_Set = std::set<Triplet>;
+
 /// Vector of Pair
 using Pair_Vec = std::vector<Pair>;
 
