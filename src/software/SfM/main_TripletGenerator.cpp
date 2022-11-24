@@ -24,8 +24,8 @@
  */
 enum ETripletMode
 {
-  TRIPLET_EXHAUSTIVE = 0, // Build every combination of image pairs
-  TRIPLET_CONTIGUOUS = 1  // Only consecutive image pairs (useful for video mode)
+  TRIPLET_EXHAUSTIVE = 0, // Build every combination of image triplets
+  TRIPLET_CONTIGUOUS = 1  // Only consecutive image triplets (useful for video mode)
 };
 
 using namespace openMVG;
@@ -38,8 +38,8 @@ void usage( const char* argv0 )
             << "[-o|--output_file]        Output file where triplets are stored\n"
             << "\n[Optional]\n"
             << "[-m|--triplet_mode] mode     Triplet generation mode\n"
-            << "       EXHAUSTIVE:        Build all possible pairs. [default]\n"
-            << "       CONTIGUOUS:        Build pairs for contiguous images (use it with --contiguous_count parameter)\n"
+            << "       EXHAUSTIVE:        Build all possible triplets. [default]\n"
+            << "       CONTIGUOUS:        Build triplets for contiguous images (use it with --contiguous_count parameter)\n"
             << "[-c|--contiguous_count] X Number of contiguous links\n"
             << "       X: will match 0 with (1->X), ...]\n"
             << "       2: will match 0 with (1,2), 1 with (2,3), ...\n"
@@ -47,7 +47,7 @@ void usage( const char* argv0 )
             << std::endl;
 }
 
-// This executable computes pairs of images to be matched
+// This executable computes triplets of images to be matched
 int main( int argc, char** argv )
 {
   CmdLine cmd;
@@ -82,7 +82,7 @@ int main( int argc, char** argv )
   std::cout << " You called:\n"
             << argv[ 0 ] << "\n"
             << "--input_file       : " << sSfMDataFilename << "\n"
-            << "--output_file      : " << sOutputPairsFilename << "\n"
+            << "--output_file      : " << sOutputtripletsFilename << "\n"
             << "Optional parameters\n"
             << "--pair_mode        : " << sPairMode << "\n"
             << "--contiguous_count : " << iContiguousCount << "\n"
@@ -94,7 +94,7 @@ int main( int argc, char** argv )
     std::cerr << "[Error] Input file not set." << std::endl;
     exit( EXIT_FAILURE );
   }
-  if ( sOutputPairsFilename.empty() )
+  if ( sOutputtripletsFilename.empty() )
   {
     usage( argv[ 0 ] );
     std::cerr << "[Error] Output file not set." << std::endl;
@@ -129,19 +129,19 @@ int main( int argc, char** argv )
   }
   const size_t NImage = sfm_data.GetViews().size();
 
-  // 2. Compute pairs
+  // 2. Compute triplets
   std::cout << "Computing triplets." << std::endl;
   Triplet_Set triplets;
   switch ( tripletMode )
   {
     case TRIPLET_EXHAUSTIVE:
     {
-      triplets = exhaustivePairs( NImage );
+      triplets = exhaustivetriplets( NImage );
       break;
     }
     case TRIPLET_CONTIGUOUS:
     {
-      pairs = contiguousWithOverlap( NImage, iContiguousCount );
+      triplets = contiguousWithOverlap( NImage, iContiguousCount );
       break;
     }
     default:
@@ -151,11 +151,11 @@ int main( int argc, char** argv )
     }
   }
 
-  // 3. Save pairs
+  // 3. Save triplets
   std::cout << "Saving triplets." << std::endl;
   if ( !saveTriplets( sOutputTripletFilename, triplets ) )
   {
-    std::cerr << "Failed to save pairs to file: \"" << sOutputTripletFilename << "\"" << std::endl;
+    std::cerr << "Failed to save triplets to file: \"" << sOutputTripletFilename << "\"" << std::endl;
     exit( EXIT_FAILURE );
   }
 
