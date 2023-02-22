@@ -31,7 +31,7 @@ inline Triplet_Set exhaustiveTriplets(const size_t N)
   for (IndexT I = 0; I < static_cast<IndexT>(N); ++I)
     for (IndexT J = I+1; J < static_cast<IndexT>(N); ++J)
       for (IndexT K = J+1; K < static_cast<IndexT>(N); ++K)
-      triplets.insert({I,J,K});
+        triplets.insert({I,J,K});
 
   return triplets;
 }
@@ -44,7 +44,7 @@ inline Triplet_Set contiguousWithOverlap(const size_t N, const size_t overlapSiz
   for (IndexT I = 0; I < static_cast<IndexT>(N); ++I)
     for (IndexT J = I+1; J < I+1+overlapSize && J < static_cast<IndexT>(N); ++J)
       for (IndexT K = J+1; J < J+1+overlapSize && K < static_cast<IndexT>(N); ++K)
-      triplets.insert({I,J,K});
+        triplets.insert({I,J,K});
   return triplets;
 }
 
@@ -87,7 +87,7 @@ inline bool loadTriplets(
       {
         OPENMVG_LOG_ERROR
           << "loadTriplets: Invalid input file. Image out of range. "
-          << "I: " << I << " J:" << J << << "K:" << K << " N:" << N << "\n"
+          << "I: " << I << " J:" << J << "K:" << K << " N:" << N << "\n"
           << "File: \"" << sFileName << "\".";
         return false;
       }
@@ -102,9 +102,9 @@ inline bool loadTriplets(
         return false;
       }
       // Insert the triplet such that max, middle, min
-      if(std::min({I, J, K}) = I && std::max({I, J, K}) != I)
+      if(std::min({I, J, K}) == I && std::max({I, J, K}) != I)
         triplets.insert( {std::min({I, J, K}), I, std::max({I, J, K})} );
-      if(std::min({I, J, K}) = J && std::max({I, J, K}) != J)
+      if(std::min({I, J, K}) == J && std::max({I, J, K}) != J)
         triplets.insert( {std::min({I, J, K}), K, std::max({I, J, K})} );
       else
         triplets.insert( {std::min({I, J, K}), K, std::max({I, J, K})} );
@@ -128,8 +128,9 @@ inline bool saveTriplets(const std::string &sFileName, const Triplet_Set & tripl
   }
   for ( const auto & cur_triplets : triplets )
   {
-    outStream << cur_triplet.first << ' ' << cur_triplet.second << cur_triplet.third <<'\n';
+    outStream << std::get<0>(cur_triplets) << ' ' << std::get<1>(cur_triplets) << ' ' << std::get<2>(cur_triplets) <<'\n';
   }
+  
   const bool bOk = !outStream.bad();
   outStream.close();
   return bOk;

@@ -21,7 +21,7 @@
 #include <map>
 #include <set>
 #include <vector>
-
+#include <tuple>
 #ifdef OPENMVG_STD_UNORDERED_MAP
 
 #include <algorithm>
@@ -46,6 +46,29 @@ namespace std {
   };
 }
 
+namespace std {
+  template<typename T1, typename T2, typename T3>
+  struct hash<std::triplet<T1, T2, T3>> {
+    std::size_t operator()(std::triplet<T1, T2, T3> const &p) const {
+      std::size_t seed1(0);
+      stl::hash_combine(seed1, p.first);
+      stl::hash_combine(seed1, p.second);
+      stl::hash_combine(seed1, p.third);
+
+      std::size_t seed2(0);
+      stl::hash_combine(seed2, p.second);
+      stl::hash_combine(seed2, p.third);
+      stl::hash_combine(seed2, p.first);
+
+      std::size_t seed3(0);
+      stl::hash_combine(seed3, p.third);
+      stl::hash_combine(seed3, p.second);
+      stl::hash_combine(seed3, p.first);
+      
+      return std::min(seed1, seed2, seed3);
+    }
+  };
+}
 #endif // OPENMVG_STD_UNORDERED_MAP
 
 /**
@@ -70,10 +93,13 @@ using Triplet = std::tuple<IndexT, IndexT, IndexT>;
 using Pair_Set = std::set<Pair>;
 
 /// Set of Triplet
-using Tripl_Set = std::set<Triplet>;
+using Triplet_Set = std::set<Triplet>;
 
 /// Vector of Pair
 using Pair_Vec = std::vector<Pair>;
+
+/// Vector of Triplet
+using Triplet_Vec = std::vector<Triplet>;
 
 #if defined OPENMVG_STD_UNORDERED_MAP
 

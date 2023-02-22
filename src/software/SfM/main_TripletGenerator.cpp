@@ -9,7 +9,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "openMVG/matching_image_collection/Pair_Builder.hpp"
+#include "openMVG/matching_image_collection/Triplet_Builder.hpp"
 #include "openMVG/sfm/sfm_data.hpp"
 #include "openMVG/sfm/sfm_data_io.hpp"
 
@@ -82,9 +82,9 @@ int main( int argc, char** argv )
   std::cout << " You called:\n"
             << argv[ 0 ] << "\n"
             << "--input_file       : " << sSfMDataFilename << "\n"
-            << "--output_file      : " << sOutputtripletsFilename << "\n"
+            << "--output_file      : " << sOutputTripletsFilename << "\n"
             << "Optional parameters\n"
-            << "--pair_mode        : " << sPairMode << "\n"
+            << "--triplet_mode        : " << sTripletMode << "\n"
             << "--contiguous_count : " << iContiguousCount << "\n"
             << std::endl;
 
@@ -94,19 +94,19 @@ int main( int argc, char** argv )
     std::cerr << "[Error] Input file not set." << std::endl;
     exit( EXIT_FAILURE );
   }
-  if ( sOutputtripletsFilename.empty() )
+  if ( sOutputTripletsFilename.empty() )
   {
     usage( argv[ 0 ] );
     std::cerr << "[Error] Output file not set." << std::endl;
     exit( EXIT_FAILURE );
   }
 
-  EPairMode pairMode;
-  if ( sPairMode == "EXHAUSTIVE" )
+  ETripletMode tripletMode;
+  if ( sTripletMode == "EXHAUSTIVE" )
   {
-    pairMode = PAIR_EXHAUSTIVE;
+    tripletMode = TRIPLET_EXHAUSTIVE;
   }
-  else if ( sPairMode == "CONTIGUOUS" )
+  else if ( sTripletMode == "CONTIGUOUS" )
   {
     if ( iContiguousCount == -1 )
     {
@@ -115,7 +115,7 @@ int main( int argc, char** argv )
       exit( EXIT_FAILURE );
     }
 
-    pairMode = PAIR_CONTIGUOUS;
+    tripletMode = TRIPLET_CONTIGUOUS;
   }
 
   // 1. Load SfM data scene
@@ -136,7 +136,7 @@ int main( int argc, char** argv )
   {
     case TRIPLET_EXHAUSTIVE:
     {
-      triplets = exhaustivetriplets( NImage );
+      triplets = exhaustiveTriplets( NImage );
       break;
     }
     case TRIPLET_CONTIGUOUS:
@@ -153,9 +153,9 @@ int main( int argc, char** argv )
 
   // 3. Save triplets
   std::cout << "Saving triplets." << std::endl;
-  if ( !saveTriplets( sOutputTripletFilename, triplets ) )
-  {
-    std::cerr << "Failed to save triplets to file: \"" << sOutputTripletFilename << "\"" << std::endl;
+  if ( !saveTriplets( sOutputTripletsFilename, triplets ) ){
+  
+    std::cerr << "Failed to save triplets to file: \"" << sOutputTripletsFilename << "\"" << std::endl;
     exit( EXIT_FAILURE );
   }
 

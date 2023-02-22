@@ -211,6 +211,7 @@ int main(int argc, char **argv)
   cmd.add( make_option('i', filename_sfm_data, "input_file") );
   cmd.add( make_option('m', directory_match, "match_dir") );
   cmd.add( make_option('M', filename_match, "match_file") );
+  cmd.add( make_option('K', filename_match, "match_triplet_file") );
   cmd.add( make_option('o', directory_output, "output_dir") );
   cmd.add( make_option('s', engine_name, "sfm_engine") );
 
@@ -255,6 +256,7 @@ int main(int argc, char **argv)
       << "\n\n"
       << "[Common]\n"
       << "[-M|--match_file] path to the match file to use (i.e matches.f.txt or matches.f.bin)\n"
+      << "[-K|--match_trifocal_file] experimental!: path to the trifocal match file to use (i.e matches_trifocal.f.txt or matches_trifocal.f.bin)\n"
       << "[-f|--refine_intrinsic_config] Intrinsic parameters refinement option\n"
       << "\t ADJUST_ALL -> refine all existing parameters (default) \n"
       << "\t NONE -> intrinsic parameters are held as constant\n"
@@ -278,9 +280,9 @@ int main(int argc, char **argv)
       << "[INCREMENTAL]\n"
       << "\t[-a|--initial_pair_a] filename of the first image (without path)\n"
       << "\t[-b|--initial_pair_b] filename of the second image (without path)\n"
-      << "\t[-x|--initial_pair_x] filename of the first image (without path)\n"
-      << "\t[-y|--initial_pair_y] filename of the second image (without path)\n"
-      << "\t[-z|--initial_pair_z] filename of the thirds image (without path)\n" // XXX
+      << "\t[-x|--initial_triplet_x] filename of the first image (without path)\n"
+      << "\t[-y|--initial_triplet_y] filename of the second image (without path)\n"
+      << "\t[-z|--initial_triplet_z] filename of the thirds image (without path)\n" // XXX
       << "\t[-c|--camera_model] Camera model type for view with unknown intrinsic:\n"
       << "\t\t 1: Pinhole \n"
       << "\t\t 2: Pinhole radial 1\n"
@@ -469,7 +471,11 @@ int main(int argc, char **argv)
       matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches.f.txt")) ||
       matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches.f.bin")) ||
       matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches.e.txt")) ||
-      matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches.e.bin")))
+      matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches.e.bin")) ||
+      matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches_trifocal.f.txt")) ||
+      matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches_trifocal.f.bin")) ||
+      matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches_trifocal.e.txt")) ||
+      matches_provider->load(sfm_data, stlplus::create_filespec(directory_match, "matches_trifocal.e.bin")))
       )
   {
     OPENMVG_LOG_ERROR << "Cannot load the match file.";
