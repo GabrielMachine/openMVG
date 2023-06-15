@@ -74,6 +74,15 @@ public:
   virtual void insert(std::pair<Pair, IndMatches>&& pairWiseMatches) = 0;
 };
 
+/// Tripletwise matches (indexed matches for a pair <I,J>)
+/// The interface used to store corresponding point indexes per images triplets
+//class TripletWiseMatchesContainer
+//{
+//public:
+//  virtual ~TripletWiseMatchesContainer() = default;
+//  virtual void insert(std::tuple<Triplet, IndMatches>&& tripletWiseMatches) = 0;
+//};
+
 //--
 /// Pairwise matches (indexed matches for a pair <I,J>)
 /// A structure used to store corresponding point indexes per images pairs
@@ -121,6 +130,50 @@ inline PairWiseMatches getPairs( const PairWiseMatches & matches, const Pair_Set
   }
   return res; 
 }
+
+//struct TripletWiseMatches :
+//    public TripletWiseMatchesContainer,
+//    public std::map<Triplet, IndMatches>
+//{
+//  void insert(std::tuple<Triplet, IndMatches> && tripletWiseMatches) override
+//  {
+//    std::map<Triplet, IndMatches>::insert(
+//      std::forward<std::tuple<Triplet, IndMatches>(tripletWiseMatches));
+//  }
+//  // Serialization
+//  template <class Archive>
+//  void serialize( Archive & ar )  {
+//    ar(static_cast<std::map<Triplet, IndMatches>&>(*this));
+//  }
+//};
+//inline Triplet_Set getTriplets(const TripletWiseMatches & matches)
+//{
+//  Triplet_Set triplets;
+//  for ( const auto & cur_triplet : matches )
+//    triplets.insert(cur_triplet.first);
+//  return triplets;
+//}
+
+/**
+ * @brief Get the subset of the matches that corresponds to the given triplets 
+ * 
+ * @param matches     Initial matches 
+ * @param triplets       The only triplets to keep 
+ * @return TripletWiseMatches The matches that are inside the tripletset
+ */
+
+//inline TripletWiseMatches getTriplets( const TripletWiseMatches & matches, const Triplet_Set & triplets )
+//{
+//  TripletWiseMatches res;
+//  for( auto it_triplet : triplets )
+//  {
+//    if( matches.count( it_triplet ) )
+//    {
+//      res.insert( std::make_tuple( it_triplet , matches.at( it_triplet ) ) );
+//    }
+//  }
+//  return res; 
+//}
 
 }  // namespace matching
 }  // namespace openMVG
