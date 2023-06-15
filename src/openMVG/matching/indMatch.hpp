@@ -76,12 +76,13 @@ public:
 
 /// Tripletwise matches (indexed matches for a pair <I,J>)
 /// The interface used to store corresponding point indexes per images triplets
-//class TripletWiseMatchesContainer
-//{
-//public:
-//  virtual ~TripletWiseMatchesContainer() = default;
-//  virtual void insert(std::tuple<Triplet, IndMatches>&& tripletWiseMatches) = 0;
-//};
+
+class TripletWiseMatchesContainer
+{
+public:
+  virtual ~TripletWiseMatchesContainer() = default;
+  virtual void insert(std::pair<Triplet, IndMatches>&& tripletWiseMatches) = 0; // Gabriel:It has to be a pair, because it's a pair of a triplet and an indMatch
+};
 
 //--
 /// Pairwise matches (indexed matches for a pair <I,J>)
@@ -131,28 +132,29 @@ inline PairWiseMatches getPairs( const PairWiseMatches & matches, const Pair_Set
   return res; 
 }
 
-//struct TripletWiseMatches :
-//    public TripletWiseMatchesContainer,
-//    public std::map<Triplet, IndMatches>
-//{
-//  void insert(std::tuple<Triplet, IndMatches> && tripletWiseMatches) override
-//  {
-//    std::map<Triplet, IndMatches>::insert(
-//      std::forward<std::tuple<Triplet, IndMatches>(tripletWiseMatches));
-//  }
-//  // Serialization
-//  template <class Archive>
-//  void serialize( Archive & ar )  {
-//    ar(static_cast<std::map<Triplet, IndMatches>&>(*this));
-//  }
-//};
-//inline Triplet_Set getTriplets(const TripletWiseMatches & matches)
-//{
-//  Triplet_Set triplets;
-//  for ( const auto & cur_triplet : matches )
-//    triplets.insert(cur_triplet.first);
-//  return triplets;
-//}
+struct TripletWiseMatches :
+  public TripletWiseMatchesContainer,
+  public std::map<Triplet, IndMatches>
+{
+  void insert(std::pair<Triplet, IndMatches> && tripletWiseMatches) override
+  {
+    std::map<Triplet, IndMatches>::insert(
+      std::forward<std::pair<Triplet, IndMatches>>(tripletWiseMatches));
+  }
+
+  // Serialization
+  template <class Archive>
+  void serialize( Archive & ar )  {
+    ar(static_cast<std::map<Triplet, IndMatches>&>(*this));
+  }
+};
+inline Triplet_Set getTriplets(const TripletWiseMatches & matches)
+{
+  Triplet_Set triplets;
+  for ( const auto & cur_triplet : matches )
+    triplets.insert(cur_triplet.first);
+  return triplets;
+}
 
 /**
  * @brief Get the subset of the matches that corresponds to the given triplets 
@@ -162,18 +164,18 @@ inline PairWiseMatches getPairs( const PairWiseMatches & matches, const Pair_Set
  * @return TripletWiseMatches The matches that are inside the tripletset
  */
 
-//inline TripletWiseMatches getTriplets( const TripletWiseMatches & matches, const Triplet_Set & triplets )
-//{
-//  TripletWiseMatches res;
-//  for( auto it_triplet : triplets )
-//  {
-//    if( matches.count( it_triplet ) )
-//    {
-//      res.insert( std::make_tuple( it_triplet , matches.at( it_triplet ) ) );
-//    }
-//  }
-//  return res; 
-//}
+inline TripletWiseMatches getTriplets( const TripletWiseMatches & matches, const Triplet_Set & triplets )
+{
+  TripletWiseMatches res;
+  for( auto it_triplet : triplets )
+  {
+    if( matches.count( it_triplet ) )
+    {
+      res.insert( std::make_pair( it_triplet , matches.at( it_triplet ) ) );
+    }
+  }
+  return res; 
+}
 
 }  // namespace matching
 }  // namespace openMVG
